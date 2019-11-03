@@ -1,0 +1,35 @@
+
+
+#title-wrapper {
+  position: absolute; 
+  top: 50%;
+  left: 50%;
+ 
+  
+}
+
+#title {
+	font-size: 50;
+	position: relative;
+	left: -50%; 
+	background: red;
+
+body {
+	margin: 0;
+	height: 100vh;
+}
+	
+canvas {
+	display: block;
+}
+
+/*
+  background: red;
+  position: absolute;
+  float: left;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;*/
+}
