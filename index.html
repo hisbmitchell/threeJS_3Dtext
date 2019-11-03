@@ -1,133 +1,98 @@
-<!DOCTYPE html>
 <html>
-<head>
+	<head>
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
 
-	<meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>NON/BEING</title>
-
-    <link rel="stylesheet" href="styles.css">
+		<link rel="stylesheet" href="main.css">
 
 	</head>
+	<body>
 
-<body>
+		<div id="title-wrapper">
 
-	<canvas id="c"></canvas>
+		<div id="title">NON/BEING</div>
 
-	</body>
+	</div>
 
-	<script type="module">
-	import * as THREE from '../three/build/three.module.js';
-	import {EffectComposer} from './three/examples/jsm/postprocessing/EffectComposer.js';
-	import {RenderPass} from './three/examples/jsm/postprocessing/RenderPass.js';
-	import {BloomPass} from './three/examples/jsm/postprocessing/BloomPass.js';
-	import {FilmPass} from './three/examples/jsm/postprocessing/FilmPass.js';
-	
+		<script src="js/three.js"></script>
+		
+
+		<script>
 
 
+var scene = new THREE.Scene();
 
 
-function main() {
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 ); // fov, aspect, near and far
+camera.position.set(-15, 0, 25);
+camera.lookAt( scene.position );
 
 
-  const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
 
-  const fov = 75;
-  const aspect = 2;  // the canvas default
-  const near = 0.1;
-  const far = 5;
-  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.z = 2;
+var loader = new THREE.FontLoader();
 
-  const scene = new THREE.Scene();
+loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
-  {
-    const color = 0xFFFFFF;
-    const intensity = 2;
-    const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(-1, 2, 4);
-    scene.add(light);
-  }
+  var material = new THREE.MeshLambertMaterial( { color: 0x0033ff, specular: 0x555555, shininess: 30 } );
+
+  var geometry = new THREE.TextGeometry( 'NON/BEING', {
+    font: font,
+    size: 5,
+    height: 2,
+    curveSegments: 5,
+    bevelEnabled: true,
+    bevelThickness: 15,
+    bevelSize: 2,
+    bevelSegments: 50
+  } );
 
 
-  const boxWidth = 1;
-  const boxHeight = 1;
-  const boxDepth = 1;
-  const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+  var mesh = new THREE.Mesh( geometry, material );
 
-    const material = new THREE.MeshPhongMaterial({color: 0xFFFFFF});
+   mesh.position.x = -15;
 
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
 
-   
+  scene.add(mesh);
+
+
+
+  var light = new THREE.DirectionalLight( 0xffffff,1 , 500 );
+  light.position.set( 0, 1, 1 ).normalize();
+  scene.add(light);
+
+
+  var renderer = new THREE.WebGLRenderer();
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  document.body.appendChild( renderer.domElement );
+
+  window.addEventListener('resize', () => {
+  	renderer.setSize(window.innerWidth, window.innerHeight);
+  	camera.aspect = window.innerWidth / window.innerHeight;
+
+  	camera.updateProjectMatrix();
+
+  })
   
+  var render = function(){
 
+  	requestAnimationFrame(render);
 
+  	mesh.rotation.x += 0.01;
+  	mesh.rotation.y += -0.0001;
 
-  const composer = new EffectComposer(renderer);
-  composer.addPass(new RenderPass(scene, camera));
+  	mesh.scale.x += 0.001;
+  	mesh.scale.y += 0.001;
 
-  const bloomPass = new BloomPass(
-      1,    // strength
-      25,   // kernel size
-      4,    // sigma ?
-      256,  // blur render target resolution
-  );
-  composer.addPass(bloomPass);
-
-  const filmPass = new FilmPass(
-      0.35,   // noise intensity
-      0.025,  // scanline intensity
-      648,    // scanline count
-      false,  // grayscale
-  );
-  filmPass.renderToScreen = true;
-  composer.addPass(filmPass);
-
-  function resizeRendererToDisplaySize(renderer) {
-    const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
-    }
-    return needResize;
+  	renderer.render( scene, camera );
   }
 
-  let then = 0;
-  function render(now) {
-    now *= 0.001;  // convert to seconds
-    const deltaTime = now - then;
-    then = now;
+  render();
 
-    if (resizeRendererToDisplaySize(renderer)) {
-      const canvas = renderer.domElement;
-      camera.aspect = canvas.clientWidth / canvas.clientHeight;
-      camera.updateProjectionMatrix();
-      composer.setSize(canvas.width, canvas.height);
-    }
 
-   
-      cube.rotation.x = now;
-      cube.rotation.y = now;
-   
-
-    composer.render(deltaTime);
-
-    requestAnimationFrame(render);
-  }
-
-  requestAnimationFrame(render);
-}
-
-main();
-
-</script>
-
+} );
+		</script>
+	</body>
 </html>
-
-
-
